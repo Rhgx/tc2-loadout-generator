@@ -14,6 +14,11 @@ const backgrounds = [
 
 const asset = (path: string) => `${import.meta.env.BASE_URL}${path}`;
 const choose = <T,>(items: T[]) => items[Math.floor(Math.random() * items.length)];
+const preloadImage = (url: string) => new Promise<void>((resolve) => {
+  const image = new Image();
+  image.onload = image.onerror = () => resolve();
+  image.src = url;
+});
 const experimentalCatalog: WeaponCatalog = Object.fromEntries(Object.entries(weapons).map(([className, slots]) => {
   const additions = experimentalWeapons[className] || {};
   const merged = Object.fromEntries(Object.entries(slots).map(([slot, items]) => [
@@ -43,7 +48,7 @@ function iconPath(className: string) {
 function WeaponCard({ weapon, changing, experimental }: { weapon: Weapon; changing: boolean; experimental: boolean }) {
   return (
     <div className={`item-container${changing ? ' changing' : ''}`}>
-      <img src={asset(weapon.image)} alt={weapon.name} draggable={false} />
+      <img src={asset(weapon.image)} alt={weapon.name} draggable={false} loading="lazy" decoding="async" />
       <p className={experimental ? 'experimental-weapon' : undefined}>{weapon.name}</p>
     </div>
   );
@@ -74,25 +79,14 @@ export function LoadoutGenerator({
   const loadoutRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const background = asset(`images/backgrounds/${choose(backgrounds)}.png`);
+    const background = asset(`images/backgrounds/${choose(backgrounds)}.webp`);
     document.body.style.backgroundImage = `url('${background}')`;
 
     const urls = new Set<string>([background]);
     classes.forEach((className) => urls.add(iconPath(className)));
-    Object.entries(classPortraits).forEach(([className, portrait]) => {
-      urls.add(asset(portrait));
-      Object.values(catalog[className]).forEach((items) => {
-        items?.forEach((weapon) => urls.add(asset(weapon.image)));
-      });
-    });
 
-    Promise.allSettled([...urls].map((url) => new Promise<void>((resolve, reject) => {
-      const image = new Image();
-      image.onload = () => resolve();
-      image.onerror = () => reject();
-      image.src = url;
-    }))).finally(() => setLoading(false));
-  }, [catalog]);
+    Promise.all([...urls].map(preloadImage)).finally(() => setLoading(false));
+  }, []);
 
   const generate = useCallback(() => {
     const now = Date.now();
@@ -178,7 +172,7 @@ export function LoadoutGenerator({
                   aria-label={`Select ${className}`}
                   aria-pressed={selectedClass === className}
                 >
-                  <img className={`class-icon${selectedClass === className ? ' selected' : ''}`} src={iconPath(className)} alt={className} draggable={false} />
+                  <img className={`class-icon${selectedClass === className ? ' selected' : ''}`} src={iconPath(className)} alt={className} draggable={false} loading="eager" decoding="async" />
                 </button>
               ))}
             </div>
@@ -189,7 +183,7 @@ export function LoadoutGenerator({
           <div ref={loadoutRef} className="loadout-container show" style={{ display: 'block' }}>
             <p className="class-name">Your loadout for {loadout.className} is..</p>
             <div className="row">
-              <div className="col"><div className="portrait"><img className={`class-portrait${changing ? ' changing' : ''}`} src={asset(classPortraits[loadout.className])} alt={loadout.className} draggable={false} /></div></div>
+              <div className="col"><div className="portrait"><img className={`class-portrait${changing ? ' changing' : ''}`} src={asset(classPortraits[loadout.className])} alt={loadout.className} draggable={false} loading="lazy" decoding="async" /></div></div>
               <div className="col">
                 <WeaponCard weapon={loadout.Primary} changing={changing} experimental={experimentalNames.has(loadout.Primary.name)} />
                 <WeaponCard weapon={loadout.Secondary} changing={changing} experimental={experimentalNames.has(loadout.Secondary.name)} />
