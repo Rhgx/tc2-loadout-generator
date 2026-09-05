@@ -917,16 +917,6 @@ export const weapons: WeaponCatalog = {
         "name": "Wrench",
         "image": "images/weapons-generated/wrench-02f3a7592e.webp"
       }
-    ],
-    "PDA": [
-      {
-        "name": "Construct",
-        "image": "images/weapons-generated/construct-0b6da9ed78.webp"
-      },
-      {
-        "name": "Demolish",
-        "image": "images/weapons-generated/demolish-3782ac195b.webp"
-      }
     ]
   },
   "Doctor": {

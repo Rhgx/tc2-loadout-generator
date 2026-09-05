@@ -9,7 +9,8 @@ const wikiApi = 'https://typicalcolors2.fandom.com/api.php?action=parse&page=Wea
 const experimentalWikiApi = 'https://typicalcolors2.fandom.com/api.php?action=parse&page=Item_Qualities/Experimental&prop=text&format=json&origin=*';
 const classes = ['Flanker', 'Trooper', 'Arsonist', 'Annihilator', 'Brute', 'Mechanic', 'Doctor', 'Marksman', 'Agent'] as const;
 const slots = ['Primary', 'Secondary', 'Melee', 'PDA'] as const;
-const excludedWeapons = new Set(['disguise kit']);
+// Fixed utility slots have no alternatives to randomize.
+const excludedWeapons = new Set(['disguise kit', 'construct', 'demolish']);
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const assetDirectory = path.join(projectRoot, 'public', 'images', 'weapons-generated');
 const outputFile = path.join(projectRoot, 'src', 'data', 'weapons.generated.ts');
