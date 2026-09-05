@@ -100,7 +100,7 @@ h1 {
 .class-button {
   padding: 3px 8px 3px 3px;
   min-height: 48px;
-  font-size: 16px;
+  font-size: 18px;
   text-transform: uppercase;
   justify-content: flex-start;
 }
@@ -172,10 +172,14 @@ h1 {
 .optional-slot {
   display: grid;
   min-height: 0;
-  animation: portrait-in 180ms ease-out;
+  opacity: 1;
+  transition: opacity 180ms ease-out;
+}
+@starting-style {
+  .optional-slot { opacity: 0; }
 }
 .optional-slot.leaving {
-  animation: portrait-out 180ms ease-in both;
+  opacity: 0;
 }
 .optional-slot > .item-container:first-child {
   border-top-left-radius: 0;
@@ -238,8 +242,8 @@ h1 {
 .dimming:nth-child(2) h3 span { animation-delay: 35ms; }
 .dimming:nth-child(3) .weapon-image img,
 .dimming:nth-child(3) h3 span { animation-delay: 70ms; }
-.dimming:nth-child(4) .weapon-image img,
-.dimming:nth-child(4) h3 span { animation-delay: 105ms; }
+.optional-slot .dimming .weapon-image img,
+.optional-slot .dimming h3 span { animation-delay: 105ms; }
 .revealing .weapon-image img { animation: item-reveal 180ms cubic-bezier(.2, .7, .3, 1); }
 .revealing h3 span { animation: name-reveal 180ms ease-out; }
 .generate-button.generating { opacity: 1; }
