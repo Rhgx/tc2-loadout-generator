@@ -7,9 +7,9 @@
   "scripts": {
     "dev": "vite",
     "scrape": "pnpm scrape:standard && pnpm scrape:experimental",
-    "scrape:standard": "tsx scripts/scrape-weapons.ts",
-    "scrape:experimental": "tsx scripts/scrape-experimental.ts",
-    "typecheck": "tsc --noEmit",
+    "scrape:standard": "tsx scripts/scrape/standard.ts",
+    "scrape:experimental": "tsx scripts/scrape/experimental.ts",
+    "typecheck": "tsc --noEmit && tsc --project tsconfig.node.json --noEmit",
     "build": "vite build",
     "preview": "vite preview"
   },
