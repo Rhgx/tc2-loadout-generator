@@ -55,6 +55,7 @@ export function FracturedCredit({ onShatter }: { onShatter: (finished: Promise<v
     const start = performance.now();
     const gravity = 980;
     const frame = (now: number) => {
+      // Cap the physics step so returning from a stalled frame does not launch shards offscreen.
       const delta = previousTime === null ? 0 : Math.min(1 / 30, (now - previousTime) / 1000);
       previousTime = now;
       bodies.forEach((body) => {

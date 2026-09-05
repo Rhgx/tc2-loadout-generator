@@ -69,9 +69,9 @@ h1 {
   isolation: isolate;
   border: 1px solid var(--edge);
   padding: 12px;
-  background-color: #414254;
-  background-image: linear-gradient(#ffffff12 1px, transparent 1px), linear-gradient(90deg, #ffffff12 1px, transparent 1px);
-  background-size: 20px 20px;
+  background-color: rgb(25.5% 25.9% 32.9%);
+  background-image: linear-gradient(rgb(34.1% 34.1% 40.4%) 1px, transparent 1px), linear-gradient(90deg, rgb(34.1% 34.1% 40.4%) 1px, transparent 1px);
+  background-size: 30px 30px;
 }
 .grid-background {
   position: absolute;
@@ -124,13 +124,23 @@ h1 {
   }
 }
 .equipment {
-  --card-height: min(142.5px, (100cqw - 76px) * .197916667);
+  /* Reference card proportions, before the extra vertical image padding. */
+  --card-aspect-ratio: calc(266 / 672);
+  --card-max-width: 360px;
+  --panel-padding: 20px;
+  --column-gap: 34px;
+  --image-padding: 6px;
+  --card-gap: 10px;
+  --card-width: min(var(--card-max-width), (100cqw - 2 * var(--panel-padding) - 2px - var(--column-gap)) / 2);
+  --card-height: calc(var(--card-width) * var(--card-aspect-ratio));
+  /* Reserve Agent's fourth slot for every class to keep the layout stationary. */
+  --list-height: calc(4 * (var(--card-height) + 2 * var(--image-padding)) + 3 * var(--card-gap));
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 360px));
+  grid-template-columns: repeat(2, minmax(0, var(--card-max-width)));
   justify-content: center;
-  gap: 34px;
-  min-height: calc(4 * var(--card-height) + 120px);
-  padding: 20px;
+  gap: var(--column-gap);
+  min-height: calc(var(--list-height) + 2 * var(--panel-padding) + 2px);
+  padding: var(--panel-padding);
   border: 1px solid var(--edge);
   background: linear-gradient(#414254, #292a39);
 }
@@ -163,17 +173,17 @@ h1 {
 .weapon-list {
   display: grid;
   width: 100%;
-  height: calc(4 * var(--card-height) + 78px);
-  grid-auto-rows: calc(var(--card-height) + 12px);
+  height: var(--list-height);
+  grid-auto-rows: calc(var(--card-height) + 2 * var(--image-padding));
   align-content: start;
-  gap: 10px;
+  gap: var(--card-gap);
   min-width: 0;
 }
 .optional-slot {
   display: grid;
   min-height: 0;
   opacity: 1;
-  transition: opacity 180ms ease-out;
+  transition: opacity var(--slot-fade-duration) ease-out;
 }
 @starting-style {
   .optional-slot { opacity: 0; }
@@ -188,7 +198,7 @@ h1 {
 .item-container {
   container-type: inline-size;
   display: grid;
-  grid-template-rows: calc((100% - 12px) * .272727) minmax(0, 1fr);
+  grid-template-rows: calc((100% - 2 * var(--image-padding)) * (3 / 11)) minmax(0, 1fr);
   overflow: hidden;
   border: 1px solid var(--edge);
   background: linear-gradient(#1e1f2b, #292a3a);
@@ -230,7 +240,7 @@ h1 {
 .weapon-image img {
   position: absolute;
   width: 60%;
-  height: calc((100% - 12px) * .9);
+  height: calc((100% - 2 * var(--image-padding)) * .9);
   object-fit: contain;
   top: 50%;
   left: 50%;
@@ -333,9 +343,9 @@ h1 {
     gap: 5px;
   }
   .equipment {
-    --card-height: min(142.5px, (100cqw - 44px) * .219907407);
-    gap: 14px;
-    padding: 14px;
+    --panel-padding: 14px;
+    --column-gap: 14px;
+    --card-width: min(var(--card-max-width), (100cqw - 2 * var(--panel-padding) - 2px - var(--column-gap)) / 1.8);
     grid-template-columns: minmax(0, .8fr) minmax(0, 1fr);
   }
   .class-portrait {
@@ -360,10 +370,10 @@ h1 {
     height: 32px;
   }
   .equipment {
-    --card-height: min(142.5px, (100cqw - 26px) * .395833333);
-    grid-template-columns: minmax(0, 360px);
-    padding: 12px;
-    min-height: calc(4 * var(--card-height) + 228px);
+    --panel-padding: 12px;
+    --card-width: min(var(--card-max-width), 100cqw - 2 * var(--panel-padding) - 2px);
+    grid-template-columns: minmax(0, var(--card-max-width));
+    min-height: calc(var(--list-height) + 110px + var(--column-gap) + 2 * var(--panel-padding) + 2px);
   }
   .portrait {
     flex-direction: row;
