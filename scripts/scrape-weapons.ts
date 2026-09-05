@@ -132,7 +132,7 @@ async function localize(weapons: Awaited<ReturnType<typeof scrape>>): Promise<Ca
       const file = `${slug(weapon.name)}-${hash}.webp`;
       const response = await fetch(weapon.remoteImage);
       if (!response.ok) throw new Error(`Image request failed with ${response.status}: ${weapon.remoteImage}`);
-      const webp = await sharp(Buffer.from(await response.arrayBuffer())).webp({ quality: 85, effort: 5 }).toBuffer();
+      const webp = await sharp(Buffer.from(await response.arrayBuffer())).trim({ background: '#00000000', threshold: 1 }).webp({ quality: 85, effort: 5 }).toBuffer();
       await writeFile(path.join(assetDirectory, file), webp);
       files.add(file);
       imageByUrl.set(weapon.remoteImage, `images/weapons-generated/${file}`);

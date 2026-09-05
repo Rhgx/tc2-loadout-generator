@@ -44,7 +44,7 @@ h1, h2, h3, p {
   font-weight: 400;
 }
 .container {
-  width: min(1060px, 100%);
+  width: min(880px, 100%);
   margin: auto;
   padding: 28px 24px;
 }
@@ -64,6 +64,7 @@ h1 {
   line-height: 1.3;
 }
 .loadout-shell {
+  container-type: inline-size;
   position: relative;
   isolation: isolate;
   border: 1px solid var(--edge);
@@ -99,7 +100,8 @@ h1 {
 .class-button {
   padding: 3px 8px 3px 3px;
   min-height: 48px;
-  font-size: 18px;
+  font-size: 16px;
+  text-transform: uppercase;
   justify-content: flex-start;
 }
 .class-icon {
@@ -122,10 +124,12 @@ h1 {
   }
 }
 .equipment {
+  --card-height: min(142.5px, (100cqw - 76px) * .197916667);
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  min-height: 624px;
+  grid-template-columns: repeat(2, minmax(0, 360px));
+  justify-content: center;
+  gap: 34px;
+  min-height: calc(4 * var(--card-height) + 120px);
   padding: 20px;
   border: 1px solid var(--edge);
   background: linear-gradient(#414254, #292a39);
@@ -158,18 +162,32 @@ h1 {
 }
 .weapon-list {
   display: grid;
-  height: 582px;
-  grid-auto-rows: 138px;
-  align-content: center;
+  width: 100%;
+  height: calc(4 * var(--card-height) + 78px);
+  grid-auto-rows: calc(var(--card-height) + 12px);
+  align-content: start;
   gap: 10px;
   min-width: 0;
 }
-.item-container {
+.optional-slot {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+  animation: portrait-in 180ms ease-out;
+}
+.optional-slot.leaving {
+  animation: portrait-out 180ms ease-in both;
+}
+.optional-slot > .item-container:first-child {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.item-container {
+  container-type: inline-size;
+  display: grid;
+  grid-template-rows: calc((100% - 12px) * .272727) minmax(0, 1fr);
   overflow: hidden;
   border: 1px solid var(--edge);
-  background: #232432;
+  background: linear-gradient(#1e1f2b, #292a3a);
 }
 .item-container:first-child {
   border-top-left-radius: 7px;
@@ -180,14 +198,16 @@ h1 {
   border-bottom-right-radius: 7px;
 }
 .item-container h3 {
-  padding: 3px 10px;
-  background: #f5d945;
-  color: #f5f5f5;
-  -webkit-text-stroke: 2px #202020;
+  display: grid;
+  place-items: center;
+  padding: 0 6px;
+  background: #ffd700;
+  color: #fff;
+  -webkit-text-stroke: .3cqw #000;
   paint-order: stroke fill;
-  font-size: 20px;
+  font-size: 6.4cqw;
   text-align: center;
-  line-height: 1.3;
+  line-height: 1;
   overflow-wrap: anywhere;
 }
 .item-container.stock-weapon h3 {
@@ -197,15 +217,20 @@ h1 {
   background: #69a451;
 }
 .weapon-image {
+  position: relative;
+  overflow: hidden;
   min-height: 0;
   display: flex;
   justify-content: center;
-  padding: 8px 55px;
 }
 .weapon-image img {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  width: 60%;
+  height: calc((100% - 12px) * .9);
   object-fit: contain;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 .dimming .weapon-image img,
 .dimming h3 span { animation: item-dim 70ms ease-out both; }
@@ -236,13 +261,6 @@ h1 {
 .empty-loadout img {
   opacity: .65;
 }
-.action-bar {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 16px;
-  padding-top: 12px;
-}
 .menu-button {
   min-height: 44px;
   padding: 7px 16px;
@@ -252,8 +270,9 @@ h1 {
   flex-shrink: 0;
 }
 .generate-button {
-  min-width: 180px;
-  font-size: 24px;
+  min-width: 140px;
+  margin-left: auto;
+  font-size: 21px;
   background: linear-gradient(#71994e, #3b602e);
 }
 .credits {
@@ -310,15 +329,13 @@ h1 {
     gap: 5px;
   }
   .equipment {
+    --card-height: min(142.5px, (100cqw - 44px) * .219907407);
     gap: 14px;
     padding: 14px;
     grid-template-columns: minmax(0, .8fr) minmax(0, 1fr);
   }
   .class-portrait {
     height: 280px;
-  }
-  .weapon-image {
-    padding: 8px 16px;
   }
 }
 @media (max-width: 480px) {
@@ -339,9 +356,10 @@ h1 {
     height: 32px;
   }
   .equipment {
-    grid-template-columns: 1fr;
+    --card-height: min(142.5px, (100cqw - 26px) * .395833333);
+    grid-template-columns: minmax(0, 360px);
     padding: 12px;
-    min-height: 796px;
+    min-height: calc(4 * var(--card-height) + 228px);
   }
   .portrait {
     flex-direction: row;
@@ -359,22 +377,6 @@ h1 {
     width: auto;
     flex: 1;
     font-size: 23px;
-  }
-  .weapon-list {
-    height: 646px;
-    grid-auto-rows: 154px;
-  }
-  .weapon-image {
-    padding: 10px 55px;
-  }
-  .action-bar {
-    position: sticky;
-    bottom: 0;
-    margin: 8px -8px -8px;
-    padding: 8px;
-    background: #2d2e3c;
-    border-top: 1px solid var(--edge);
-    z-index: 1;
   }
   .generate-button {
     min-width: 150px;

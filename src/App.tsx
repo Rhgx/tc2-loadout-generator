@@ -16,11 +16,19 @@ const backgrounds = [
 
 const asset = (path: string) => `${import.meta.env.BASE_URL}${path}`;
 const choose = <T,>(items: T[]) => items[Math.floor(Math.random() * items.length)];
-const preloadImage = (url: string) => new Promise<void>((resolve) => {
+const imageLoads = new Map<string, Promise<void>>();
+const preloadImage = (url: string): Promise<void> => {
+  const cached = imageLoads.get(url);
+  if (cached) return cached;
   const image = new Image();
-  image.onload = image.onerror = () => resolve();
   image.src = url;
-});
+  const ready = image.decode().catch((error: unknown) => {
+    imageLoads.delete(url);
+    console.warn(`Unable to load image: ${url}`, error);
+  });
+  imageLoads.set(url, ready);
+  return ready;
+};
 const experimentalCatalog: WeaponCatalog = Object.fromEntries(Object.entries(weapons).map(([className, slots]) => {
   const additions = experimentalWeapons[className] || {};
   const merged = Object.fromEntries(Object.entries(slots).map(([slot, items]) => [
@@ -71,6 +79,23 @@ function WeaponCard({ slot, weapon, delay, experimental }: { slot: string; weapo
   );
 }
 
+function OptionalWeaponCard({ weapon, experimental }: { weapon?: Weapon; experimental: boolean }) {
+  const [retained, setRetained] = useState({ weapon, experimental });
+  useEffect(() => {
+    if (weapon || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setRetained({ weapon, experimental });
+      return;
+    }
+    const timer = window.setTimeout(() => setRetained({ weapon: undefined, experimental: false }), 180);
+    return () => window.clearTimeout(timer);
+  }, [weapon, experimental]);
+  const visibleWeapon = weapon ?? retained.weapon;
+  if (!visibleWeapon) return null;
+  return <div className={`optional-slot${weapon ? '' : ' leaving'}`} aria-hidden={!weapon}>
+    <WeaponCard slot="PDA" weapon={visibleWeapon} delay={105} experimental={weapon ? experimental : retained.experimental} />
+  </div>;
+}
+
 function Portrait({ className }: { className: string }) {
   const lastClass = useRef(className);
   const [previous, setPrevious] = useState<string | null>(null);
@@ -115,7 +140,27 @@ export function LoadoutGenerator({
   const lastGeneratedAt = useRef(0);
   const classIconsRef = useRef<HTMLDivElement>(null);
   const generationTimer = useRef<number | undefined>(undefined);
-  useEffect(() => () => window.clearTimeout(generationTimer.current), []);
+  const generationId = useRef(0);
+  useEffect(() => () => {
+    window.clearTimeout(generationTimer.current);
+    generationId.current += 1;
+  }, []);
+
+  useEffect(() => {
+    if (!selectedClass) return;
+    const names = selectedClass === 'Random' ? Object.keys(classPortraits) : [selectedClass];
+    const urls = [...new Set(names.flatMap((name) => [
+      asset(classPortraits[name]),
+      ...Object.values(catalog[name]).flatMap((items) => items.map((weapon) => asset(weapon.image))),
+    ]))];
+    let cancelled = false;
+    let next = 0;
+    const warm = async () => {
+      while (!cancelled && next < urls.length) await preloadImage(urls[next++]);
+    };
+    void Promise.all(Array.from({ length: 4 }, warm));
+    return () => { cancelled = true; };
+  }, [catalog, selectedClass]);
 
   useEffect(() => {
     const background = asset(`images/backgrounds/${choose(backgrounds)}.webp`);
@@ -127,7 +172,7 @@ export function LoadoutGenerator({
     Promise.all([...urls].map(preloadImage)).finally(() => setLoading(false));
   }, []);
 
-  const generate = useCallback(() => {
+  const generate = useCallback(async () => {
     const now = Date.now();
     if (changing || now - lastGeneratedAt.current < 360) return;
     lastGeneratedAt.current = now;
@@ -136,6 +181,7 @@ export function LoadoutGenerator({
     const className = selectedClass === 'Random' ? choose(Object.keys(classPortraits)) : selectedClass;
     const slots = catalog[className];
     setChanging(true);
+    const request = ++generationId.current;
     setRotation((value) => value + 360);
       const nextLoadout: Loadout = {
         className,
@@ -156,6 +202,13 @@ export function LoadoutGenerator({
           if (required.slot === 'PDA') nextLoadout.PDA = required.weapon;
         }
       }
+      await Promise.all([
+        preloadImage(asset(classPortraits[className])),
+        ...[nextLoadout.Primary, nextLoadout.Secondary, nextLoadout.Melee, nextLoadout.PDA]
+          .filter((weapon) => weapon !== undefined)
+          .map((weapon) => preloadImage(asset(weapon.image))),
+      ]);
+      if (request !== generationId.current) return;
       setLoadout(nextLoadout);
       if (matchMedia('(prefers-reduced-motion: reduce)').matches) setChanging(false);
       else generationTimer.current = window.setTimeout(() => setChanging(false), 360);
@@ -201,6 +254,7 @@ export function LoadoutGenerator({
       )}
       <main className="container">
         <header className="page-header"><h1>{title}</h1>
+        <button className={`menu-button generate-button${changing ? ' generating' : ''}`} type="button" onClick={generate} disabled={!selectedClass || changing}><RefreshCw className="generate-icon" style={{ transform: `rotate(${rotation}deg)` }} size={21} aria-hidden="true" /><span>Generate</span></button>
         {navigation && <button className="menu-button" type="button" onClick={navigation.onClick}><ArrowLeft size={18} aria-hidden="true" />{navigation.label}</button>}
         </header>
         <div className="loadout-shell">
@@ -226,11 +280,10 @@ export function LoadoutGenerator({
               <WeaponCard slot="Primary" weapon={loadout.Primary} delay={0} experimental={experimentalNames.has(loadout.Primary.name)} />
               <WeaponCard slot="Secondary" weapon={loadout.Secondary} delay={35} experimental={experimentalNames.has(loadout.Secondary.name)} />
               <WeaponCard slot="Melee" weapon={loadout.Melee} delay={70} experimental={experimentalNames.has(loadout.Melee.name)} />
-              {loadout.PDA && <WeaponCard slot="PDA" weapon={loadout.PDA} delay={105} experimental={experimentalNames.has(loadout.PDA.name)} />}
+              <OptionalWeaponCard weapon={loadout.PDA} experimental={!!loadout.PDA && experimentalNames.has(loadout.PDA.name)} />
             </div>
           </> : <div className="empty-loadout"><img src={asset('images/tc2-monochrome.svg')} alt="Typical Colors 2" width={120} height={120} draggable={false} /></div>}
           </section>
-          <div className="action-bar"><button className={`menu-button generate-button${changing ? ' generating' : ''}`} type="button" onClick={generate} disabled={!selectedClass || changing}><RefreshCw className="generate-icon" style={{ transform: `rotate(${rotation}deg)` }} size={21} aria-hidden="true" /><span>Generate</span></button></div>
         </div>
         <footer className="credits"><span>Site: {onCreditsUnlock ? <FracturedCredit onShatter={onCreditsUnlock} /> : 'Rocks'}</span><span>Class portraits: Alyssa</span><span>Weapon icons: TC2 Wiki</span></footer>
       </main>

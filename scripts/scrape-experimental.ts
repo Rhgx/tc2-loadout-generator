@@ -95,7 +95,7 @@ async function generate() {
     const response = await fetch(item.imageUrl);
     if (!response.ok) throw new Error(`Image request failed with ${response.status}: ${item.imageUrl}`);
     const bytes = Buffer.from(await response.arrayBuffer());
-    await writeFile(path.join(assetDirectory, file), await sharp(bytes).webp({ quality: 85, effort: 5 }).toBuffer());
+    await writeFile(path.join(assetDirectory, file), await sharp(bytes).trim({ background: '#00000000', threshold: 1 }).webp({ quality: 85, effort: 5 }).toBuffer());
     return { ...item, image: `images/experimental-generated/${file}` };
   }));
 
