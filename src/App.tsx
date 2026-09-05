@@ -180,7 +180,10 @@ export function LoadoutGenerator({
           classIconsRef.current.querySelectorAll('button')[next]?.focus();
         }
       } else if (event.code === 'Space' || event.code === 'Enter') {
-        if (event.target instanceof HTMLElement && event.target.closest('button, a')) return;
+        const spaceOnClass = event.code === 'Space'
+          && event.target instanceof Node
+          && classIconsRef.current?.contains(event.target);
+        if (!spaceOnClass && event.target instanceof HTMLElement && event.target.closest('button, a')) return;
         event.preventDefault();
         generate();
       }
