@@ -5,6 +5,8 @@ import { experimentalWeapons } from './data/experimental.generated';
 import { weapons } from './data/weapons.generated';
 import { useSecretRoute } from './useSecretRoute';
 import { FracturedCredit } from './FracturedCredit';
+import { ArrowLeft, RefreshCw } from 'lucide-react';
+import { GridBackground } from './GridBackground';
 
 const classes = [...Object.keys(classPortraits), 'Random'];
 const backgrounds = [
@@ -41,17 +43,51 @@ type Loadout = {
 
 function iconPath(className: string) {
   return className === 'Random'
-    ? asset('images/questionClass.png')
+    ? asset('images/icons/random.svg')
     : asset(`images/icons/${className.toLowerCase()}transparent.png`);
 }
 
-function WeaponCard({ weapon, changing, experimental }: { weapon: Weapon; changing: boolean; experimental: boolean }) {
+function WeaponCard({ slot, weapon, delay, experimental }: { slot: string; weapon: Weapon; delay: number; experimental: boolean }) {
+  const [displayed, setDisplayed] = useState({ weapon, experimental });
+  const [phase, setPhase] = useState('revealing');
+  useEffect(() => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setDisplayed({ weapon, experimental });
+      setPhase('idle');
+      return;
+    }
+    setPhase('dimming');
+    const reveal = window.setTimeout(() => {
+      setDisplayed({ weapon, experimental });
+      setPhase('revealing');
+    }, 70 + delay);
+    return () => window.clearTimeout(reveal);
+  }, [weapon, experimental, delay]);
   return (
-    <div className={`item-container${changing ? ' changing' : ''}`}>
-      <img src={asset(weapon.image)} alt={weapon.name} draggable={false} loading="lazy" decoding="async" />
-      <p className={experimental ? 'experimental-weapon' : undefined}>{weapon.name}</p>
-    </div>
+    <article aria-label={`${slot}: ${displayed.weapon.name}`} className={`item-container ${phase}${displayed.experimental ? ' experimental-weapon' : displayed.weapon.stock ? ' stock-weapon' : ''}`}>
+      <h3><span>{displayed.weapon.name}</span></h3>
+      <div className="weapon-image"><img src={asset(displayed.weapon.image)} alt="" draggable={false} decoding="async" /></div>
+    </article>
   );
+}
+
+function Portrait({ className }: { className: string }) {
+  const lastClass = useRef(className);
+  const [previous, setPrevious] = useState<string | null>(null);
+  useEffect(() => {
+    if (lastClass.current === className) return;
+    setPrevious(matchMedia('(prefers-reduced-motion: reduce)').matches ? null : lastClass.current);
+    lastClass.current = className;
+    const timer = window.setTimeout(() => setPrevious(null), 200);
+    return () => window.clearTimeout(timer);
+  }, [className]);
+  return <div className="portrait">
+    <div className="portrait-images">
+      {previous && <img className="class-portrait portrait-previous" src={asset(classPortraits[previous])} alt="" aria-hidden="true" />}
+      <img key={className} className="class-portrait portrait-current" src={asset(classPortraits[className])} alt={className} draggable={false} />
+    </div>
+    <h2>{className}</h2>
+  </div>;
 }
 
 type LoadoutGeneratorProps = {
@@ -74,9 +110,12 @@ export function LoadoutGenerator({
   const [selectedClass, setSelectedClass] = useState<string | null>(null);
   const [loadout, setLoadout] = useState<Loadout | null>(null);
   const [changing, setChanging] = useState(false);
+  const [rotation, setRotation] = useState(0);
   const [loading, setLoading] = useState(true);
   const lastGeneratedAt = useRef(0);
-  const loadoutRef = useRef<HTMLDivElement>(null);
+  const classIconsRef = useRef<HTMLDivElement>(null);
+  const generationTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(generationTimer.current), []);
 
   useEffect(() => {
     const background = asset(`images/backgrounds/${choose(backgrounds)}.webp`);
@@ -90,17 +129,14 @@ export function LoadoutGenerator({
 
   const generate = useCallback(() => {
     const now = Date.now();
-    if (now - lastGeneratedAt.current < 500) return;
+    if (changing || now - lastGeneratedAt.current < 360) return;
     lastGeneratedAt.current = now;
-    if (!selectedClass) {
-      window.alert('Please select a class first!');
-      return;
-    }
+    if (!selectedClass) return;
 
     const className = selectedClass === 'Random' ? choose(Object.keys(classPortraits)) : selectedClass;
     const slots = catalog[className];
     setChanging(true);
-    window.setTimeout(() => {
+    setRotation((value) => value + 360);
       const nextLoadout: Loadout = {
         className,
         Primary: choose(slots.Primary),
@@ -121,26 +157,30 @@ export function LoadoutGenerator({
         }
       }
       setLoadout(nextLoadout);
-      setChanging(false);
-      window.setTimeout(() => loadoutRef.current?.scrollIntoView({ behavior: 'smooth' }), 0);
-    }, loadout ? 300 : 0);
-  }, [catalog, experimentalNames, loadout, requireExperimental, selectedClass]);
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) setChanging(false);
+      else generationTimer.current = window.setTimeout(() => setChanging(false), 360);
+  }, [catalog, experimentalNames, changing, requireExperimental, selectedClass]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.defaultPrevented) return;
+      if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
+      if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
       const directions = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
       if (directions.includes(event.code)) {
         event.preventDefault();
         const current = selectedClass ? classes.indexOf(selectedClass) : -1;
-        const width = 5;
+        const width = classIconsRef.current ? getComputedStyle(classIconsRef.current).gridTemplateColumns.split(' ').length : 5;
         let next = current < 0 ? 0 : current;
         if (event.code === 'ArrowLeft') next = current > 0 ? current - 1 : classes.length - 1;
         if (event.code === 'ArrowRight') next = current < classes.length - 1 ? current + 1 : 0;
         if (event.code === 'ArrowUp') next = (current - width + classes.length) % classes.length;
         if (event.code === 'ArrowDown') next = (current + width) % classes.length;
         setSelectedClass(classes[next]);
+        if (event.target instanceof Node && classIconsRef.current?.contains(event.target)) {
+          classIconsRef.current.querySelectorAll('button')[next]?.focus();
+        }
       } else if (event.code === 'Space' || event.code === 'Enter') {
+        if (event.target instanceof HTMLElement && event.target.closest('button, a')) return;
         event.preventDefault();
         generate();
       }
@@ -156,43 +196,40 @@ export function LoadoutGenerator({
           <div className="loading-content"><div className="loading-spinner" /><div id="loading-progress">Loading assets…</div></div>
         </div>
       )}
-      <div className="credits">Site : {onCreditsUnlock ? <FracturedCredit onShatter={onCreditsUnlock} /> : 'Rocks'}<br />Class Portraits : Alyssa<br />Weapon Icons : TC2 Wiki</div>
-      <main className="container py-5">
-        {navigation && <button className="btn experimental-btn" type="button" onClick={navigation.onClick}>{navigation.label}</button>}
-        <h1 className="text-center mb-4">{title}</h1>
-        <div className="class-container-wrapper">
-          <div className="class-container mb-4">
-            <div className="class-icons">
+      <main className="container">
+        <header className="page-header"><h1>{title}</h1>
+        {navigation && <button className="menu-button" type="button" onClick={navigation.onClick}><ArrowLeft size={18} aria-hidden="true" />{navigation.label}</button>}
+        </header>
+        <div className="loadout-shell">
+          <GridBackground />
+            <div className="class-icons" ref={classIconsRef} aria-label="Classes">
               {classes.map((className) => (
                 <button
-                  className="btn btn-dark"
+                  className="class-button"
                   type="button"
                   key={className}
                   onClick={() => setSelectedClass(className)}
                   aria-label={`Select ${className}`}
                   aria-pressed={selectedClass === className}
                 >
-                  <img className={`class-icon${selectedClass === className ? ' selected' : ''}`} src={iconPath(className)} alt={className} draggable={false} loading="eager" decoding="async" />
+                  <img className="class-icon" src={iconPath(className)} alt="" draggable={false} decoding="async" /><span>{className}</span>
                 </button>
               ))}
             </div>
-          </div>
-        </div>
-        <div className="text-center mb-4"><button className="btn btn-success btn-gen" type="button" onClick={generate}>Generate</button></div>
-        {loadout && (
-          <div ref={loadoutRef} className="loadout-container show" style={{ display: 'block' }}>
-            <p className="class-name">Your loadout for {loadout.className} is..</p>
-            <div className="row">
-              <div className="col"><div className="portrait"><img className={`class-portrait${changing ? ' changing' : ''}`} src={asset(classPortraits[loadout.className])} alt={loadout.className} draggable={false} loading="lazy" decoding="async" /></div></div>
-              <div className="col">
-                <WeaponCard weapon={loadout.Primary} changing={changing} experimental={experimentalNames.has(loadout.Primary.name)} />
-                <WeaponCard weapon={loadout.Secondary} changing={changing} experimental={experimentalNames.has(loadout.Secondary.name)} />
-                <WeaponCard weapon={loadout.Melee} changing={changing} experimental={experimentalNames.has(loadout.Melee.name)} />
-                {loadout.PDA && <WeaponCard weapon={loadout.PDA} changing={changing} experimental={experimentalNames.has(loadout.PDA.name)} />}
-              </div>
+          <section className="equipment" aria-label="Generated loadout" aria-busy={changing}>
+          {loadout ? <>
+            <Portrait className={loadout.className} />
+            <div className="weapon-list">
+              <WeaponCard slot="Primary" weapon={loadout.Primary} delay={0} experimental={experimentalNames.has(loadout.Primary.name)} />
+              <WeaponCard slot="Secondary" weapon={loadout.Secondary} delay={35} experimental={experimentalNames.has(loadout.Secondary.name)} />
+              <WeaponCard slot="Melee" weapon={loadout.Melee} delay={70} experimental={experimentalNames.has(loadout.Melee.name)} />
+              {loadout.PDA && <WeaponCard slot="PDA" weapon={loadout.PDA} delay={105} experimental={experimentalNames.has(loadout.PDA.name)} />}
             </div>
-          </div>
-        )}
+          </> : <div className="empty-loadout"><img src={asset('images/tc2-monochrome.svg')} alt="Typical Colors 2" width={120} height={120} draggable={false} /></div>}
+          </section>
+          <div className="action-bar"><button className={`menu-button generate-button${changing ? ' generating' : ''}`} type="button" onClick={generate} disabled={!selectedClass || changing}><RefreshCw className="generate-icon" style={{ transform: `rotate(${rotation}deg)` }} size={21} aria-hidden="true" /><span>Generate</span></button></div>
+        </div>
+        <footer className="credits"><span>Site: {onCreditsUnlock ? <FracturedCredit onShatter={onCreditsUnlock} /> : 'Rocks'}</span><span>Class portraits: Alyssa</span><span>Weapon icons: TC2 Wiki</span></footer>
       </main>
     </>
   );

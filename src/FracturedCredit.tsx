@@ -108,7 +108,7 @@ export function FracturedCredit({ onShatter }: { onShatter: (finished: Promise<v
       onClick={crack}
       onPointerDown={captureImpact}
       aria-label="Rocks"
-      title="Rocks"
+      title="🪨"
       style={{
         '--fracture-opacity': Math.min(1, fracture * 1.2),
         '--impact-x': `${impact.x * 100}%`,

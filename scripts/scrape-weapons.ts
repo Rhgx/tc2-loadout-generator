@@ -17,7 +17,7 @@ const outputFile = path.join(projectRoot, 'src', 'data', 'weapons.generated.ts')
 
 type ClassName = typeof classes[number];
 type Slot = typeof slots[number];
-type Weapon = { name: string; image: string };
+type Weapon = { name: string; image: string; stock?: boolean };
 type Catalog = Record<ClassName, Partial<Record<Slot, Weapon[]>>>;
 
 const clean = (value = '') => value.replace(/\[\d+\]/g, '').replace(/\s+/g, ' ').trim();
@@ -53,16 +53,16 @@ function tableGrid(table: Element): Element[][] {
   return grid;
 }
 
-function weaponFromCell(cell: Element): { name: string; remoteImage: string } | null {
+function weaponFromCell(cell: Element): { name: string; remoteImage: string; stock: boolean } | null {
   const links = [...cell.querySelectorAll("a[href*='/wiki/']")]
     .filter((link) => !/File:|Special:|Category:|Template:/i.test(`${link.getAttribute('href')} ${link.getAttribute('title')}`));
   const link = links.at(-1);
   const name = clean(link?.textContent || link?.getAttribute('title') || '');
   const remoteImage = imageUrl(cell.querySelector('img'));
-  return name && remoteImage ? { name, remoteImage } : null;
+  return name && remoteImage ? { name, remoteImage, stock: /\bStock\b/.test(cell.textContent || '') } : null;
 }
 
-async function scrape(): Promise<Array<{ classNames: string[]; slot: Slot; name: string; remoteImage: string }>> {
+async function scrape(): Promise<Array<{ classNames: string[]; slot: Slot; name: string; remoteImage: string; stock: boolean }>> {
   const [response, experimentalResponse] = await Promise.all([fetch(wikiApi), fetch(experimentalWikiApi)]);
   if (!response.ok) throw new Error(`TC2 wiki request failed with ${response.status}`);
   if (!experimentalResponse.ok) throw new Error(`TC2 experimental wiki request failed with ${experimentalResponse.status}`);
@@ -82,7 +82,7 @@ async function scrape(): Promise<Array<{ classNames: string[]; slot: Slot; name:
       .filter((name) => name && !classes.includes(name as ClassName)),
   );
   const output = document.querySelector('.mw-parser-output') || document.body;
-  const weapons: Array<{ classNames: string[]; slot: Slot; name: string; remoteImage: string }> = [];
+  const weapons: Array<{ classNames: string[]; slot: Slot; name: string; remoteImage: string; stock: boolean }> = [];
   let currentClasses: string[] = [];
   let currentSlot: Slot | null = null;
   let inWeaponList = false;
@@ -146,7 +146,7 @@ async function localize(weapons: Awaited<ReturnType<typeof scrape>>): Promise<Ca
     const target = catalog[className as ClassName];
     target[weapon.slot] ||= [];
     if (!target[weapon.slot]!.some((item) => item.name === weapon.name)) {
-      target[weapon.slot]!.push({ name: weapon.name, image: imageByUrl.get(weapon.remoteImage)! });
+      target[weapon.slot]!.push({ name: weapon.name, image: imageByUrl.get(weapon.remoteImage)!, ...(weapon.stock ? { stock: true } : {}) });
     }
   }));
   Object.values(catalog).forEach((classWeapons) => Object.values(classWeapons).forEach((items) => items.sort((a, b) => a.name.localeCompare(b.name))));

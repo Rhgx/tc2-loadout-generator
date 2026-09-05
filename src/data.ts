@@ -1,4 +1,4 @@
-export type Weapon = { name: string; image: string };
+export type Weapon = { name: string; image: string; stock?: boolean };
 
 export type WeaponSlots = Record<'Primary' | 'Secondary' | 'Melee', Weapon[]> & {
   PDA?: Weapon[];

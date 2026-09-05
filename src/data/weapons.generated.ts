@@ -15,7 +15,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Lever Shotgun",
-        "image": "images/weapons-generated/lever-shotgun-7fb5a25428.webp"
+        "image": "images/weapons-generated/lever-shotgun-7fb5a25428.webp",
+        "stock": true
       },
       {
         "name": "Lupara DB",
@@ -81,7 +82,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Pistol",
-        "image": "images/weapons-generated/pistol-6519b54c34.webp"
+        "image": "images/weapons-generated/pistol-6519b54c34.webp",
+        "stock": true
       },
       {
         "name": "Raven",
@@ -107,7 +109,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Bat",
-        "image": "images/weapons-generated/bat-0cbe053a63.webp"
+        "image": "images/weapons-generated/bat-0cbe053a63.webp",
+        "stock": true
       },
       {
         "name": "Bloxy Award",
@@ -215,7 +218,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Rocket Launcher",
-        "image": "images/weapons-generated/rocket-launcher-9c4107cd9c.webp"
+        "image": "images/weapons-generated/rocket-launcher-9c4107cd9c.webp",
+        "stock": true
       },
       {
         "name": "Stellar Carpet",
@@ -293,7 +297,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Shotgun",
-        "image": "images/weapons-generated/shotgun-afde9473cd.webp"
+        "image": "images/weapons-generated/shotgun-afde9473cd.webp",
+        "stock": true
       }
     ],
     "Melee": [
@@ -303,7 +308,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Crowbar",
-        "image": "images/weapons-generated/crowbar-a99fbfbb34.webp"
+        "image": "images/weapons-generated/crowbar-a99fbfbb34.webp",
+        "stock": true
       },
       {
         "name": "Equalizer",
@@ -367,7 +373,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Flamethrower",
-        "image": "images/weapons-generated/flamethrower-b7d448a8d5.webp"
+        "image": "images/weapons-generated/flamethrower-b7d448a8d5.webp",
+        "stock": true
       },
       {
         "name": "HuangLong's Wrath",
@@ -417,7 +424,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Shotgun",
-        "image": "images/weapons-generated/shotgun-afde9473cd.webp"
+        "image": "images/weapons-generated/shotgun-afde9473cd.webp",
+        "stock": true
       }
     ],
     "Melee": [
@@ -431,7 +439,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Fire Extinguisher",
-        "image": "images/weapons-generated/fire-extinguisher-e049bb59ac.webp"
+        "image": "images/weapons-generated/fire-extinguisher-e049bb59ac.webp",
+        "stock": true
       },
       {
         "name": "Frying Pan",
@@ -487,7 +496,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Grenade Launcher",
-        "image": "images/weapons-generated/grenade-launcher-beb7ae4362.webp"
+        "image": "images/weapons-generated/grenade-launcher-beb7ae4362.webp",
+        "stock": true
       },
       {
         "name": "Gunboats",
@@ -549,7 +559,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Stickybomb Launcher",
-        "image": "images/weapons-generated/stickybomb-launcher-90e2a22e9b.webp"
+        "image": "images/weapons-generated/stickybomb-launcher-90e2a22e9b.webp",
+        "stock": true
       },
       {
         "name": "Tide Turner",
@@ -571,7 +582,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Broken Sword",
-        "image": "images/weapons-generated/broken-sword-762c66e15b.webp"
+        "image": "images/weapons-generated/broken-sword-762c66e15b.webp",
+        "stock": true
       },
       {
         "name": "Cuteness Overload",
@@ -663,7 +675,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Minigun",
-        "image": "images/weapons-generated/minigun-d5b1f166e1.webp"
+        "image": "images/weapons-generated/minigun-d5b1f166e1.webp",
+        "stock": true
       },
       {
         "name": "Monitor of Duty",
@@ -729,7 +742,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Shotgun",
-        "image": "images/weapons-generated/shotgun-afde9473cd.webp"
+        "image": "images/weapons-generated/shotgun-afde9473cd.webp",
+        "stock": true
       },
       {
         "name": "Special-Ops Sushi",
@@ -763,7 +777,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Fists",
-        "image": "images/weapons-generated/fists-d1ecc56e14.webp"
+        "image": "images/weapons-generated/fists-d1ecc56e14.webp",
+        "stock": true
       },
       {
         "name": "Fists of Steel",
@@ -843,7 +858,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Shotgun",
-        "image": "images/weapons-generated/shotgun-afde9473cd.webp"
+        "image": "images/weapons-generated/shotgun-afde9473cd.webp",
+        "stock": true
       },
       {
         "name": "Widowmaker",
@@ -865,7 +881,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Pistol",
-        "image": "images/weapons-generated/pistol-6519b54c34.webp"
+        "image": "images/weapons-generated/pistol-6519b54c34.webp",
+        "stock": true
       },
       {
         "name": "Short Circuit",
@@ -915,7 +932,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Wrench",
-        "image": "images/weapons-generated/wrench-02f3a7592e.webp"
+        "image": "images/weapons-generated/wrench-02f3a7592e.webp",
+        "stock": true
       }
     ]
   },
@@ -939,7 +957,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Syringe Crossbow",
-        "image": "images/weapons-generated/syringe-crossbow-da307c696a.webp"
+        "image": "images/weapons-generated/syringe-crossbow-da307c696a.webp",
+        "stock": true
       },
       {
         "name": "Syringe SMG",
@@ -961,7 +980,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Medigun",
-        "image": "images/weapons-generated/medigun-dd0c825c0d.webp"
+        "image": "images/weapons-generated/medigun-dd0c825c0d.webp",
+        "stock": true
       },
       {
         "name": "Rejuvenator",
@@ -1007,7 +1027,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Saw",
-        "image": "images/weapons-generated/saw-7cdc0205a7.webp"
+        "image": "images/weapons-generated/saw-7cdc0205a7.webp",
+        "stock": true
       },
       {
         "name": "Supersaw",
@@ -1051,7 +1072,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Sniper Rifle",
-        "image": "images/weapons-generated/sniper-rifle-64112c64ee.webp"
+        "image": "images/weapons-generated/sniper-rifle-64112c64ee.webp",
+        "stock": true
       },
       {
         "name": "Sour Shots",
@@ -1093,7 +1115,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "MAC-10",
-        "image": "images/weapons-generated/mac-10-cb66c33b3b.webp"
+        "image": "images/weapons-generated/mac-10-cb66c33b3b.webp",
+        "stock": true
       },
       {
         "name": "Razorback",
@@ -1139,7 +1162,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Machete",
-        "image": "images/weapons-generated/machete-53813b8d23.webp"
+        "image": "images/weapons-generated/machete-53813b8d23.webp",
+        "stock": true
       },
       {
         "name": "Mischievous Machete",
@@ -1179,7 +1203,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Revolver",
-        "image": "images/weapons-generated/revolver-b6cc60f888.webp"
+        "image": "images/weapons-generated/revolver-b6cc60f888.webp",
+        "stock": true
       },
       {
         "name": "Silenced Pistol",
@@ -1197,7 +1222,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Invis-Watch",
-        "image": "images/weapons-generated/invis-watch-3de976cce9.webp"
+        "image": "images/weapons-generated/invis-watch-3de976cce9.webp",
+        "stock": true
       }
     ],
     "Melee": [
@@ -1227,7 +1253,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Knife",
-        "image": "images/weapons-generated/knife-b95bb2dc34.webp"
+        "image": "images/weapons-generated/knife-b95bb2dc34.webp",
+        "stock": true
       },
       {
         "name": "Mod Max",
@@ -1253,7 +1280,8 @@ export const weapons: WeaponCatalog = {
       },
       {
         "name": "Sapper",
-        "image": "images/weapons-generated/sapper-915516a4d9.webp"
+        "image": "images/weapons-generated/sapper-915516a4d9.webp",
+        "stock": true
       },
       {
         "name": "Slow Burn",
