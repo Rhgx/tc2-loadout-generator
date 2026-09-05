@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { classPortraits, type Weapon, type WeaponCatalog, type WeaponSlots } from './data';
+import { qualityColors, weaponQualities } from './data/weaponQualities';
 import { experimentalWeapons } from './data/experimental.generated';
 import { weapons } from './data/weapons.generated';
 import { useSecretRoute } from './hooks/useSecretRoute';
@@ -120,10 +121,19 @@ function WeaponCard({
     }, itemDimDurationMs + delay);
     return () => window.clearTimeout(reveal);
   }, [weapon, experimental, delay]);
+  const quality = displayed.experimental
+    ? 'experimental'
+    : displayed.weapon.stock
+      ? 'stock'
+      : weaponQualities[displayed.weapon.name] ?? 'unique';
+  const style: CSSProperties & { '--quality-color': string } = {
+    '--quality-color': qualityColors[quality],
+  };
   return (
     <article
       aria-label={`${slot}: ${displayed.weapon.name}`}
-      className={`item-container ${phase}${displayed.experimental ? ' experimental-weapon' : displayed.weapon.stock ? ' stock-weapon' : ''}`}
+      className={`item-container ${phase}`}
+      style={style}
     >
       <h3>
         <span>{displayed.weapon.name}</span>

@@ -215,7 +215,7 @@ h1 {
   display: grid;
   place-items: center;
   padding: 0 6px;
-  background: #ffd700;
+  background: var(--quality-color);
   color: #fff;
   -webkit-text-stroke: .3cqw #000;
   paint-order: stroke fill;
@@ -223,12 +223,6 @@ h1 {
   text-align: center;
   line-height: 1;
   overflow-wrap: anywhere;
-}
-.item-container.stock-weapon h3 {
-  background: #b2b2b2;
-}
-.item-container.experimental-weapon h3 {
-  background: #69a451;
 }
 .weapon-image {
   position: relative;
